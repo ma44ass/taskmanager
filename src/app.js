@@ -1,23 +1,27 @@
 const express = require('express');
-const db = require('./config/db'); // Import de notre config
+const cors = require('cors');
 require('dotenv').config();
 
+// 1. Initialisation de l'application
 const app = express();
-app.use(express.json());
 
-// Test de connexion à la DB au démarrage
-async function testConnection() {
-    try {
-        await db.query('SELECT 1');
-        console.log('🚀 Connecté à la base de données MySQL !');
-    } catch (err) {
-        console.error('❌ Erreur de connexion à la base de données:', err.message);
-    }
-}
+// 2. Les Middlewares (Indispensables !)
+app.use(cors());          // Autorise le frontend (ex: Live Server) à parler au backend
+app.use(express.json());  // Permet à Express de lire le JSON envoyé dans les requêtes POST/PUT
 
-testConnection();
+// 3. Importation de vos routes
+const taskRoutes = require('./routes/taskRoutes');
+
+// 4. Utilisation des routes
+// On préfixe toutes les routes de tâches par /api/tasks
+app.use('/api/tasks', taskRoutes);
+
+// 5. Route de test rapide pour l'équipe
+app.get('/', (req, res) => {
+    res.send("Le serveur du Task Manager est opérationnel ! 🚀");
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Serveur sur le port ${PORT}`);
+    console.log(`✅ Serveur lancé sur http://localhost:${PORT}`);
 });
