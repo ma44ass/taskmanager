@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tableau de Bord | Tâches</title>
+    <!-- Tailwind CSS v4 Browser CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="bg-slate-50 min-h-screen text-slate-900 font-sans p-6">
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <header
+        class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-100"
+      >
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Gestion des Tâches</h1>
+          <p class="text-sm text-slate-500">
+            Bienvenue sur votre espace de travail
+          </p>
+        </div>
+        <button
+          class="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors"
+        >
+          Déconnexion
+        </button>
+      </header>
+
+      <!-- STEP 1: Ajouter une tâche (Add a task) -->
+      <!-- STEP 1: Ajouter une tâche (Add a task) -->
+      <section
+        class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8"
+      >
+        <h2 class="text-lg font-semibold mb-4">Ajouter une nouvelle tâche</h2>
+
+        <!-- 1. Ajout de id="task-form" (j'ai retiré action/method car le JS s'en chargera) -->
+        <!-- J'ai passé le form en flex-col pour que la description aille en dessous -->
+        <form id="task-form" class="flex flex-col gap-4">
+          <div class="flex gap-4">
+            <!-- 2. Ajout de id="task-title" -->
+            <input
+              type="text"
+              id="task-title"
+              placeholder="Que devez-vous faire ?"
+              class="flex-1 px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <button
+              type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm"
+            >
+              Ajouter
+            </button>
+          </div>
+
+          <!-- 3. Ajout du textarea avec id="task-desc" et des classes de style similaires -->
+          <textarea
+            id="task-desc"
+            placeholder="Description de la tâche (optionnelle)"
+            class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="2"
+          ></textarea>
+        </form>
+      </section>
+
+      <!-- STEP 2: Consulter toutes les tâches (View all tasks) -->
+      <section
+        class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"
+      >
+        <h2
+          class="text-lg font-semibold mb-6 flex items-center justify-between"
+        >
+          <span>Toutes les tâches</span>
+          <span
+            id="task-count"
+            class="bg-blue-100 text-blue-700 text-xs py-1 px-3 rounded-full"
+          >
+            0 Tâches
+          </span>
+        </h2>
+        <ul id="task-list" class="space-y-4">
+          <!-- Le JavaScript va insérer les <li> ici automatiquement -->
+        </ul>
+      </section>
+      <!-- Le Template (invisible à l'écran, utilisé par le JS) -->
+      <template id="task-template">
+        <li
+          class="flex items-center justify-between p-4 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/50 transition-colors"
+        >
+          <div class="flex items-center gap-4">
+            <!-- Nouvelle Checkbox pour le statut Fait/À faire -->
+            <input
+              type="checkbox"
+              class="task-status w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+            />
+
+            <div>
+              <h3 class="task-title font-medium text-slate-800"></h3>
+              <p class="task-desc text-sm text-slate-600 mt-1"></p>
+              <!-- Pour la description -->
+              <p class="task-date text-xs text-slate-500 mt-1"></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- J'ai ajouté la classe .view-btn -->
+            <button
+              class="view-btn text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-1 bg-blue-50 rounded-md"
+            >
+              Consulter
+            </button>
+
+            <!-- J'ai ajouté la classe .edit-btn -->
+            <button
+              class="edit-btn text-sm text-slate-600 hover:text-slate-800 font-medium px-3 py-1 bg-slate-100 rounded-md"
+            >
+              Modifier
+            </button>
+
+            <!-- J'ai ajouté la classe .delete-btn -->
+            <button
+              class="delete-btn text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </li>
+      </template>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
