@@ -1,21 +1,23 @@
 const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
+const db = require('./config/db'); // Import de notre config
 require('dotenv').config();
 
 const app = express();
+app.use(express.json());
 
-// Middlewares
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json()); // Pour lire le corps des requêtes JSON (req.body)
+// Test de connexion à la DB au démarrage
+async function testConnection() {
+    try {
+        await db.query('SELECT 1');
+        console.log('🚀 Connecté à la base de données MySQL !');
+    } catch (err) {
+        console.error('❌ Erreur de connexion à la base de données:', err.message);
+    }
+}
 
-// Route de test
-app.get('/', (req, res) => {
-    res.json({ message: "L'API Task Manager est prête !" });
-});
+testConnection();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Serveur lancé sur http://localhost:${PORT}`);
+    console.log(`Serveur sur le port ${PORT}`);
 });
