@@ -10,7 +10,7 @@ app.use(cors());          // Autorise le frontend (ex: Live Server) à parler au
 app.use(express.json());  // Permet à Express de lire le JSON envoyé dans les requêtes POST/PUT
 
 // 3. Importation de vos routes
-const taskRoutes = require('./routes/taskRoutes');
+const taskRoutes = require('./src/routes/taskRoutes');
 
 // 4. Utilisation des routes
 // On préfixe toutes les routes de tâches par /api/tasks
