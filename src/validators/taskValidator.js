@@ -14,7 +14,9 @@ const taskSchema = z.object({
 
     is_completed: z.boolean().default(false),
 
-    due_date: z.string().datetime().optional().nullable()
+    due_date: z.string().datetime().optional().nullable(),
+    
+    user_id: z.number().int().positive("L'ID utilisateur est requis")
 }).strict();
 
 //Un schéma  UPDATE sans les .default()
