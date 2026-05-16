@@ -1,30 +1,32 @@
 const express = require('express');
 const cors = require('cors');
-
+const path = require('path');
 require('dotenv').config();
 
-// 1. Initialisation de l'application
+// 1. Initialisation
 const app = express();
 
-// 2. Les Middlewares (Indispensables !)
-app.use(cors());          // Autorise le frontend (ex: Live Server) à parler au backend
-app.use(express.json()); 
+// 2. Middlewares
+app.use(cors());
+app.use(express.json());
 
-// 3. Importation de vos routes
+// 3. Serveur de fichiers statiques (Frontend)
+app.use(express.static(path.join(__dirname, 'src/frontend')));
+
+// 4. Importation des routes
+// const authRoutes = require('./src/routes/authRoutes');
 const taskRoutes = require('./src/routes/taskRoutes');
-const authRoutes = require('./src/routes/authRoutes');
 
-// 4. Utilisation des routes
-// On préfixe toutes les routes de tâches par /api/tasks
-app.use('/api/auth', authRoutes)
+// 5. Utilisation des routes
+// app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
-
-// 5. Route de test rapide pour l'équipe
+// 6. Route principale (sert l'index.html si on accède à /)
 app.get('/', (req, res) => {
-    res.send("Le serveur du Task Manager est opérationnel ! 🚀");
+    res.sendFile(path.join(__dirname, 'src/frontend', 'index.html'));
 });
 
+// 7. Lancement du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`✅ Serveur lancé sur http://localhost:${PORT}`);

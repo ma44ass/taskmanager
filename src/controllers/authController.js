@@ -1,66 +1,67 @@
-const db = require('../config/db'); // Ton fichier de connexion MySQL
+const db = require('../config/db'); 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Inscription d'un nouvel utilisateur
+// Inscription
 exports.register = async (req, res) => {
     const { username, email, password } = req.body;
-
     try {
-        // 1. Hacher le mot de passe (on fait 10 tours de "salt")
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
-        // 2. Insérer dans la base de données
         const query = 'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)';
-        db.query(query, [username, email, hashedPassword], (err, result) => {
-            if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    return res.status(400).json({ message: "L'email ou le pseudo existe déjà" });
-                }
-                return res.status(500).json({ error: err.message });
-            }
-            res.status(201).json({ message: "Utilisateur créé avec succès !" });
-        });
+        
+        await db.query(query, [username, email, hashedPassword]);
+        return res.status(201).json({ message: "Utilisateur créé !" });
     } catch (error) {
-        res.status(500).json({ message: "Erreur lors du hachage" });
+        console.error("Erreur Inscription:", error);
+        if (error.code === 'ER_DUP_ENTRY') return res.status(400).json({ message: "L'email existe déjà" });
+        return res.status(500).json({ error: error.message });
     }
 };
 
-//connexion:
+// Connexion (Version ultra-stable)
 exports.login = async (req, res) => {
-    console.log("1. Route Login atteinte (Mode Promise)");
     const { email, password } = req.body;
 
     try {
-        // En mode promise(), on utilise destructuring [rows]
+        // 1. On cherche l'utilisateur
         const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-        //console.log("2. Requête terminée, nombre d'utilisateurs trouvés :", users.length);
 
-        if (users.length === 0) {
+        if (!users || users.length === 0) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect" });
         }
 
         const user = users[0];
 
-        // Vérification du mot de passe
+        // 2. Vérification mot de passe
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             return res.status(401).json({ message: "Email ou mot de passe incorrect" });
         }
 
-        // Génération du Token
+        // 3. Vérification du JWT_SECRET
+        if (!process.env.JWT_SECRET) {
+            console.error("ERREUR: JWT_SECRET est manquant dans le .env");
+            return res.status(500).json({ message: "Erreur configuration serveur" });
+        }
+
+        // 4. Génération Token
         const token = jwt.sign(
             { id: user.id, username: user.username },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
-        //console.log("3. Connexion réussie pour", user.username);
-        res.json({ message: "Connexion réussie !", token });
+        // ON ENVOIE ENFIN LA RÉPONSE (incluant le username pour le frontend)
+        console.log(`✅ Login réussi pour : ${user.email}`);
+        return res.status(200).json({ 
+            message: "Connexion réussie !", 
+            token,
+            username: user.username 
+        });
 
     } catch (error) {
-        //console.error("Erreur lors du login:", error);
-        res.status(500).json({ message: "Erreur serveur" });
+        console.error("Erreur pendant le login:", error);
+        return res.status(500).json({ message: "Erreur serveur interne" });
     }
 };
